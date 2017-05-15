@@ -354,8 +354,25 @@ if (!empty($result['node'])) {
 
     if (isset($noteworthy)) {
       $noteworthy = preg_replace($patterns, $replacements, $noteworthy);
+      $nw_arr = explode("|", $noteworthy);
+      $nw_reason = "";
+      $nw_url = "";
+
+      if (count($nw_arr) === 2) {
+        $nw_reason = $nw_arr[0];
+        $nw_url = $nw_arr[1];
+      } else {
+        $nw_reason = $noteworthy;
+        $nw_url = "";
+      }
+
       echo "there is a noteworthy document named 'doc-$nid' that<br>";
-      echo "has '$noteworthy' as noteworthy reason.<br><br>";
+      echo "has '$nw_reason' as noteworthy reason";
+
+      if ($nw_url != "") {
+        echo " and<br>has '$nw_url' as url";
+      }
+      echo ".<br><br>";
     }
   }
 } else {
