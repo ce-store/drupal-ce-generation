@@ -1,0 +1,58 @@
+<div id="controlled-english-section">
+<?php
+
+$query = new EntityFieldQuery();
+
+$query->entityCondition('entity_type', 'node')
+      ->propertyCondition('type', 'SL_Technical_Area');
+
+$result = $query->execute();
+
+function getValue($node, $field, $property) {
+  $items = field_get_items('node', $node, $field);
+  $render = field_view_value('node', $node, $field, $items[0]);
+  if (isset($render[$property]) && !empty($render[$property])) {
+    $result = $render[$property];
+    return $result;
+  } else {
+    return;
+  }
+}
+
+if (!empty($result['node'])) {
+  $nids = array_keys($result['node']);
+  $nodes = node_load_multiple($nids);
+
+  foreach ($nodes as $node) {
+    $nid = $node->nid;
+    $title = $node->title;
+
+    $code_name = getValue($node, 'field_code_name', '#markup');
+    $name = getValue($node, 'field_sl_fullname', '#markup');
+
+    $plan_options = getValue($node, 'field_project_plan', '#options');
+
+    if (isset($plan_options['entity'])) {
+      $plan = $plan_options['entity']->title;
+    }
+
+    $items = field_get_items('node', $node, 'field_project_plan');
+    $render = field_view_value('node', $node, 'field_project_plan', $items[0]);
+
+    echo "there is a technical area named '$title' that<br>";
+    echo "has '$code_name' as code name and<br>";
+    echo "has '$name' as name";
+
+    if (isset($plan)) {
+      echo " and<br>";
+      echo "has the project plan '$plan' as project plan.<br><br>";
+    } else {
+      echo ".<br><br>";
+    }
+  }
+} else {
+  echo "No results";
+}
+
+?>
+</div>

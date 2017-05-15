@@ -1,0 +1,51 @@
+<div id="controlled-english-section">
+<?php
+
+$query = new EntityFieldQuery();
+
+$query->entityCondition('entity_type', 'node')
+      ->propertyCondition('type', 'SL_Linguistic');
+
+$result = $query->execute();
+
+function getValue($node, $field, $property) {
+  $items = field_get_items('node', $node, $field);
+  $render = field_view_value('node', $node, $field, $items[0]);
+  if (isset($render[$property]) && !empty($render[$property])) {
+    $result = $render[$property];
+    return $result;
+  } else {
+    return;
+  }
+}
+
+if (!empty($result['node'])) {
+  $nids = array_keys($result['node']);
+  $nodes = node_load_multiple($nids);
+
+  foreach ($nodes as $node) {
+    $nid = $node->nid;
+    $title = $node->title;
+
+    $synonyms = getValue($node, 'field_synonym', '#markup');
+    $synonyms_arr = explode("\n", $synonyms);
+    $synonyms_arr = array_filter($synonyms_arr);
+
+    echo "there is a linguistic thing named '$title' that<br>";
+
+    for ($i = 0; $i < count($synonyms_arr); $i++) {
+      $synonym = trim($synonyms_arr[$i]);
+      echo "is expressed by '$synonym'";
+      if ($i < count($synonyms_arr) - 1) {
+        echo " and<br>";
+      } else {
+        echo ".<br><br>";
+      }
+    }
+  }
+} else {
+  echo "No results";
+}
+
+?>
+</div>

@@ -1,0 +1,42 @@
+<div id="controlled-english-section">
+<?php
+
+$query = new EntityFieldQuery();
+
+$query->entityCondition('entity_type', 'node')
+      ->propertyCondition('type', 'SL_Place');
+
+$result = $query->execute();
+
+function getValue($node, $field, $property) {
+  $items = field_get_items('node', $node, $field);
+  $render = field_view_value('node', $node, $field, $items[0]);
+  if (isset($render[$property]) && !empty($render[$property])) {
+    $result = $render[$property];
+    return $result;
+  } else {
+    return;
+  }
+}
+
+if (!empty($result['node'])) {
+  $nids = array_keys($result['node']);
+  $nodes = node_load_multiple($nids);
+
+  foreach ($nodes as $node) {
+    $nid = $node->nid;
+    $title = $node->title;
+
+    $lat = getValue($node, 'field_sl_latitude', '#markup');
+    $lon = getValue($node, 'field_sl_longitude', '#markup');
+
+    echo "there is a place named '$title' that<br>";
+    echo "has '$lat' as latitude and<br>";
+    echo "has '$lon' as longitude.<br><br>";
+  }
+} else {
+  echo "No results";
+}
+
+?>
+</div>

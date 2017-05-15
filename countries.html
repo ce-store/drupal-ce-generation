@@ -1,0 +1,23 @@
+<div id="controlled-english-section">
+<?php
+
+$query = new EntityFieldQuery();
+
+$query->entityCondition('entity_type', 'node')
+  ->propertyCondition('type', 'SL_Country');
+
+$result = $query->execute();
+
+if (!empty($result['node'])) {
+  $nids = array_keys($result['node']);
+  $nodes = node_load_multiple($nids);
+
+  foreach ($nodes as $node) {
+    echo "there is a country named '$node->title'.<br>";
+  }
+} else {
+  echo "-- No results";
+}
+
+?>
+</div>

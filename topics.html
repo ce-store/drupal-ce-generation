@@ -1,0 +1,49 @@
+<div id="controlled-english-section">
+<?php
+
+$query = new EntityFieldQuery();
+
+$query->entityCondition('entity_type', 'node')
+  ->propertyCondition('type', 'SL_Topic');
+
+$result = $query->execute();
+
+function getValue($node, $field, $property) {
+    $items = field_get_items('node', $node, $field);
+    $render = field_view_value('node', $node, $field, $items[0]);
+    if (isset($render[$property]) && !empty($render[$property])) {
+      $result = $render[$property];
+      return $result;
+    } else {
+      return;
+    }
+}
+
+if (!empty($result['node'])) {
+  $nids = array_keys($result['node']);
+  $nodes = node_load_multiple($nids);
+
+  foreach ($nodes as $node) {
+    $topic = $node->title;
+    $markers = getValue($node, 'field_marker', '#markup');
+    $markers_arr = explode("\n", $markers);
+    $markers_arr = array_filter($markers_arr);
+
+    echo "there is a topic named '$topic' that<br>";
+
+    for ($i = 0; $i < count($markers_arr); $i++) {
+      $marker = $markers_arr[$i];
+      echo "has '$marker' as marker";
+      if ($i < count($markers_arr) - 1) {
+        echo " and<br>";
+      } else {
+        echo ".<br><br>";
+      }
+    }
+  }
+} else {
+  echo "No results";
+}
+
+?>
+</div>

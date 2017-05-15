@@ -1,0 +1,66 @@
+<div id="controlled-english-section">
+<?php
+
+$query = new EntityFieldQuery();
+
+$query->entityCondition('entity_type', 'node')
+      ->propertyCondition('type', 'SL_Event');
+
+$result = $query->execute();
+
+function getValue($node, $field, $property) {
+  $items = field_get_items('node', $node, $field);
+  $render = field_view_value('node', $node, $field, $items[0]);
+  if (isset($render[$property]) && !empty($render[$property])) {
+    $result = $render[$property];
+    return $result;
+  } else {
+    return;
+  }
+}
+
+if (!empty($result['node'])) {
+  $nids = array_keys($result['node']);
+  $nodes = node_load_multiple($nids);
+
+  foreach ($nodes as $node) {
+    $nid = $node->nid;
+    $title = $node->title;
+
+    $fullname = getValue($node, 'field_sl_fullname', '#markup');
+    $date = getValue($node, 'field_sl_date', '#markup');
+    $start_date = getValue($node, 'field_sl_startdate', '#markup');
+    $end_date = getValue($node, 'field_sl_enddate', '#markup');
+    $url = getValue($node, 'field_sl_url', '#markup');
+
+    $event_series_options = getValue($node, 'field_sl_eventseries', '#options');
+    $place_options = getValue($node, 'field_sl_place', '#options');
+
+    $event_series = $event_series_options['entity']->title;
+    $place = $place_options['entity']->title;
+
+    echo "there is an event named '$title' that<br>";
+    echo "has '$fullname' as full name and<br>";
+    echo "corresponds to the date '$date' and<br>";
+    echo "has '$start_date' as start date and<br>";
+    echo "has '$end_date' as end date and<br>";
+    echo "is part of the event series '$event_series'";
+
+    if ($url) {
+      echo " and<br>";
+      echo "has '$url' as url";
+    }
+    if ($place) {
+      echo " and<br>";
+      echo "occurs at the place '$place'";
+    }
+
+    echo ".<br><br>";
+
+  }
+} else {
+  echo "No results";
+}
+
+?>
+</div>

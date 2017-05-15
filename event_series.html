@@ -1,0 +1,54 @@
+<div id="controlled-english-section">
+<?php
+
+$query = new EntityFieldQuery();
+
+$query->entityCondition('entity_type', 'node')
+      ->propertyCondition('type', 'SL_Event_Series');
+
+$result = $query->execute();
+
+function getValue($node, $field, $property) {
+  $items = field_get_items('node', $node, $field);
+  $render = field_view_value('node', $node, $field, $items[0]);
+  if (isset($render[$property]) && !empty($render[$property])) {
+    $result = $render[$property];
+    return $result;
+  } else {
+    return;
+  }
+}
+
+if (!empty($result['node'])) {
+  $nids = array_keys($result['node']);
+  $nodes = node_load_multiple($nids);
+
+  foreach ($nodes as $node) {
+    $nid = $node->nid;
+    $title = $node->title;
+
+    $fullname = getValue($node, 'field_sl_fullname', '#markup');
+    $aka = getValue($node, 'field_sl_aka', '#markup');
+    $url = getValue($node, 'field_sl_url', '#markup');
+
+    echo "there is an event series named '$title' that<br>";
+    echo "has '$fullname' as full name";
+
+    if ($url) {
+      echo " and<br>";
+      echo "has '$url' as url";
+    }
+    if ($aka) {
+      echo " and<br>";
+      echo "is also known as '$aka'";
+    }
+
+    echo ".<br><br>";
+
+  }
+} else {
+  echo "No results";
+}
+
+?>
+</div>

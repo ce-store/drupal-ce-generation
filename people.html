@@ -1,0 +1,87 @@
+<div id="controlled-english-section">
+<?php
+
+$query = new EntityFieldQuery();
+
+$query->entityCondition('entity_type', 'node')
+      ->propertyCondition('type', 'SL_Person');
+
+$result = $query->execute();
+
+function getValue($node, $field, $property) {
+  $items = field_get_items('node', $node, $field);
+  $render = field_view_value('node', $node, $field, $items[0]);
+  if (isset($render[$property]) && !empty($render[$property])) {
+    $result = $render[$property];
+    return $result;
+  } else {
+    return;
+  }
+}
+
+if (!empty($result['node'])) {
+  $nids = array_keys($result['node']);
+  $nodes = node_load_multiple($nids);
+
+  foreach ($nodes as $node) {
+    $nid = $node->nid;
+    $title = $node->title;
+
+    $forename = getValue($node, 'field_sl_forename', '#markup');
+    $surname = getValue($node, 'field_sl_surname', '#markup');
+    $fullname = getValue($node, 'field_sl_fullname', '#markup');
+    $profile_pic = getValue($node, 'field_sl_profilepic', '#markup');
+
+    $organisation_options = getValue($node, 'field_sl_defaultorg', '#options');
+    $citation_options = getValue($node, 'field_person_citation', '#options');
+
+    $organisation = $organisation_options['entity']->title;
+    $citation_obj = $citation_options['entity'];
+
+    if ($citation_obj) {
+      $citation = $citation_obj->title;
+
+      $citations = getValue($citation_obj, 'field_citation_details', '#markup');
+      $citations_arr = explode("\n", $citations);
+      $citations_arr = array_filter($citations_arr);
+    }
+
+    $title = str_replace("'", "\'", $title);
+    $forename = str_replace("'", "\'", $forename);
+    $surname = str_replace("'", "\'", $surname);
+    $fullname = str_replace("'", "\'", $fullname);
+    $organisation = str_replace("'", "\'", $organisation);
+
+    $title = str_replace("’", "\'", $title);
+    $forename = str_replace("’", "\'", $forename);
+    $surname = str_replace("’", "\'", $surname);
+    $fullname = str_replace("’", "\'", $fullname);
+    $organisation = str_replace("’", "\'", $organisation);
+
+    echo "there is a person named '$title' that<br>";
+    echo "has '$forename' as forename and<br>";
+    echo "has '$surname' as surname and<br>";
+    echo "has '$fullname' as full name and<br>";
+    echo "has the organisation '$organisation' as default organisation";
+
+    if ($profile_pic) {
+      echo " and<br>";
+      echo "has '$profile_pic' as profile picture";
+    }
+
+    if ($citation_obj) {
+      for ($i = 0; $i < count($citations_arr); $i++) {
+        echo " and<br>";
+        echo "has the person citation count '$citation-$i' as citation count";
+      }
+    }
+
+    echo ".<br><br>";
+
+  }
+} else {
+  echo "No results";
+}
+
+?>
+</div>

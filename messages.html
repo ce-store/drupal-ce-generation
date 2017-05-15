@@ -1,0 +1,43 @@
+<div id="controlled-english-section">
+<?php
+
+$query = new EntityFieldQuery();
+
+$query->entityCondition('entity_type', 'node')
+      ->propertyCondition('type', 'SL_Message');
+
+$result = $query->execute();
+
+function getValue($node, $field, $property) {
+  $items = field_get_items('node', $node, $field);
+  $render = field_view_value('node', $node, $field, $items[0]);
+  if (isset($render[$property]) && !empty($render[$property])) {
+    $result = $render[$property];
+    return $result;
+  } else {
+    return;
+  }
+}
+
+if (!empty($result['node'])) {
+  $nids = array_keys($result['node']);
+  $nodes = node_load_multiple($nids);
+
+  foreach ($nodes as $node) {
+    $nid = $node->nid;
+    $title = $node->title;
+
+    $message = getValue($node, 'field_msg_text', '#markup');
+
+    $message = str_replace('{time}', date('H:i'), $message);
+    $message = str_replace('{date}', date('l d F Y'), $message);
+
+    echo "there is a UI message named '$title' that<br>";
+    echo "has '$message' as message text.<br><br>";
+  }
+} else {
+  echo "-- No results";
+}
+
+?>
+</div>

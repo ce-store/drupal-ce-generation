@@ -1,0 +1,367 @@
+<div id="controlled-english-section">
+<?php
+
+$query = new EntityFieldQuery();
+
+$query->entityCondition('entity_type', 'node')
+      ->propertyCondition('type', 'SL_Document');
+
+$result = $query->execute();
+
+function getValue($node, $field, $property) {
+  $items = field_get_items('node', $node, $field);
+  $render = field_view_value('node', $node, $field, $items[0]);
+  if (isset($render[$property]) && !empty($render[$property])) {
+    $result = $render[$property];
+    return $result;
+  } else {
+    return;
+  }
+}
+
+if (!empty($result['node'])) {
+  $nids = array_keys($result['node']);
+  $nodes = node_load_multiple($nids);
+
+  foreach ($nodes as $node) {
+    $nid = $node->nid;
+    $title = $node->title;
+    $abstract = getValue($node, 'field_abstract', '#markup');
+    $published_type = getValue($node, 'field_published_type', '#markup');
+    $publish_date = getValue($node, 'field_publish_date', '#markup');
+    $event = getValue($node, 'field_sl_event', '#markup');
+    $venue_details = getValue($node, 'field_venue_details', '#markup');
+    $noteworthy = getValue($node, 'field_noteworthy', '#markup');
+
+    $programme = getValue($node, 'field_programme', '#title');
+    $project = getValue($node, 'field_project', '#title');
+
+    $citation_options = getValue($node, 'field_citation', '#options');
+    $publication = getValue($node, 'field_publication', '#options');
+    $publication_entity = $publication['entity'];
+
+    $type = getValue($publication_entity, 'field_pubtype', '#markup');
+    $status = getValue($publication_entity, 'field_pubstatus', '#markup');
+
+    unset($paper_file);
+    unset($paper_thumbnail);
+    unset($poster_file);
+    unset($poster_thumbnail);
+    unset($presentation_file);
+    unset($presentation_thumbnail);
+    unset($other_file);
+
+    $topics = array();
+    $topic_items = field_get_items('node', $node, 'field_topic');
+    if (is_array($topic_items)) {
+      foreach ($topic_items as $topic_item) {
+        $topic_render = field_view_value('node', $node, 'field_topic', $topic_item);
+        $topic_options = $topic_render['#options'];
+        $topic_entity = $topic_options['entity'];
+        $topic = $topic_entity->title;
+        $topics[] = $topic;
+      }
+    }
+
+    $variant_options = getValue($node, 'field_paper_variant', '#options');
+    if (isset($variant_options)) {
+      $variant_entity = $variant_options['entity'];
+      $variant = $variant_entity->nid;
+    }
+
+    $file_items = field_get_items('node', $node, 'field_publicfile');
+    if (is_array($file_items)) {
+      foreach ($file_items as $file_item) {
+        $file_render = field_view_value('node', $node, 'field_publicfile', $file_item);
+        $file = $file_render['#file'];
+        $filename = $file->filename;
+        $description = $file->description;
+
+        if (strcmp($description, 'Paper file') == 0) {
+          $paper_file = $filename;
+        } else if (strcmp($description, 'Paper thumbnail') == 0) {
+          $paper_thumbnail = $filename;
+        } else if (strcmp($description, 'Poster file') == 0) {
+          $poster_file = $filename;
+        } else if (strcmp($description, 'Poster thumbnail') == 0) {
+          $poster_thumbnail = $filename;
+        } else if (strcmp($description, 'Presentation file') == 0) {
+          $presentation_file = $filename;
+        } else if (strcmp($description, 'Presentation thumbnail') == 0) {
+          $presentation_thumbnail = $filename;
+        } else if (strcmp($description, 'Other file') == 0) {
+          $other_file = $filename;
+        }
+      }
+    }
+
+    $author1 = getValue($node, 'field_sl_author', '#title');
+    $author2 = getValue($node, 'field_sl_author2', '#title');
+    $author3 = getValue($node, 'field_sl_author3', '#title');
+    $author4 = getValue($node, 'field_sl_author4', '#title');
+    $author5 = getValue($node, 'field_sl_author5', '#title');
+    $author6 = getValue($node, 'field_sl_author6', '#title');
+    $author7 = getValue($node, 'field_sl_author7', '#title');
+    $author8 = getValue($node, 'field_sl_author8', '#title');
+    $author9 = getValue($node, 'field_sl_author9', '#title');
+    $author10 = getValue($node, 'field_sl_author10', '#title');
+    $author11 = getValue($node, 'field_sl_author11', '#title');
+    $author12 = getValue($node, 'field_sl_author12', '#title');
+    $author13 = getValue($node, 'field_sl_author13', '#title');
+    $author14 = getValue($node, 'field_sl_author14', '#title');
+    $author15 = getValue($node, 'field_sl_author15', '#title');
+
+    $patterns = array();
+    $patterns[0] = "/'/";
+    $patterns[1] = "/’/";
+    $replacements = array();
+    $replacements[0] = "\'";
+    $replacements[1] = "\'";
+
+    $title = preg_replace($patterns, $replacements, $title);
+
+    echo "there is a document named 'doc-$nid' that<br>";
+    echo "is a $type and<br>";
+    echo "has '$title' as title and<br>";
+
+    if (isset($status) && $status !== 'Published') {
+      echo "has '$status' as status and<br>";
+    }
+
+    echo "applies to the programme '$programme' and<br>";
+
+    if (isset($publish_date)) {
+      echo "has the date '$publish_date' as publish date and<br>";
+    }
+    if (isset($event)) {
+      $event = preg_replace($patterns, $replacements, $event);
+      echo "has the event '$event' as venue and<br>";
+    }
+    if (isset($venue_details)) {
+      $venue_details = preg_replace($patterns, $replacements, $venue_details);
+      echo "has '$venue_details' as venue details and<br>";
+    }
+    if (isset($project)) {
+      $project = preg_replace($patterns, $replacements, $project);
+      echo "has the project '$project' as project and<br>";
+    }
+    if (isset($variant)) {
+      $variant = preg_replace($patterns, $replacements, $variant);
+      echo "has the document 'doc-$variant' as variant and<br>";
+    }
+    if (isset($paper_file)) {
+      echo "has 'https://dais-ita.org/sites/default/files/$paper_file' as paper file and<br>";
+    }
+    if (isset($paper_thumbnail)) {
+      echo "has 'https://dais-ita.org/sites/default/files/$paper_thumbnail' as paper thumbnail and<br>";
+    }
+    if (isset($poster_file)) {
+      echo "has 'https://dais-ita.org/sites/default/files/$poster_file' as poster file and<br>";
+    }
+    if (isset($poster_thumbnail)) {
+      echo "has 'https://dais-ita.org/sites/default/files/$poster_thumbnail' as poster thumbnail and<br>";
+    }
+    if (isset($presentation_file)) {
+      echo "has 'https://dais-ita.org/sites/default/files/$presentation_file' as presentation file and<br>";
+    }
+    if (isset($presentation_thumbnail)) {
+      echo "has 'https://dais-ita.org/sites/default/files/$presentation_thumbnail' as presentation thumbnail and<br>";
+    }
+    if (isset($other_file)) {
+      echo "has 'https://dais-ita.org/sites/default/files/$other_file' as extra file and<br>";
+    }
+    if (isset($citation_options)) {
+      $citation_obj = $citation_options['entity'];
+      $citation = $citation_obj->title;
+      $citations = getValue($citation_obj, 'field_citation_details', '#markup');
+
+      $citations_arr = explode("\n", $citations);
+      $citations_arr = array_filter($citations_arr);
+
+      for ($i = 0; $i < count($citations_arr); $i++) {
+        echo "has the paper citation count '$citation-$i' as citation count and<br>";
+      }
+    }
+
+    foreach ($topics as $topic) {
+      echo "is on the topic '$topic' and<br>";
+    }
+
+    $num_authors = 1;
+    $author1 = preg_replace($patterns, $replacements, $author1);
+    echo "has the ordered author 'doc-$nid-author-$author1' as author and<br>";
+    if (isset($author2)) {
+      $author2 = preg_replace($patterns, $replacements, $author2);
+      echo "has the ordered author 'doc-$nid-author-$author2' as author and<br>";
+      ++$num_authors;
+    }
+    if (isset($author3)) {
+      $author3 = preg_replace($patterns, $replacements, $author3);
+      echo "has the ordered author 'doc-$nid-author-$author3' as author and<br>";
+      ++$num_authors;
+    }
+    if (isset($author4)) {
+      $author4 = preg_replace($patterns, $replacements, $author4);
+      echo "has the ordered author 'doc-$nid-author-$author4' as author and<br>";
+      ++$num_authors;
+    }
+    if (isset($author5)) {
+      $author5 = preg_replace($patterns, $replacements, $author5);
+      echo "has the ordered author 'doc-$nid-author-$author5' as author and<br>";
+      ++$num_authors;
+    }
+    if (isset($author6)) {
+      $author6 = preg_replace($patterns, $replacements, $author6);
+      echo "has the ordered author 'doc-$nid-author-$author6' as author and<br>";
+      ++$num_authors;
+    }
+    if (isset($author7)) {
+      $author7 = preg_replace($patterns, $replacements, $author7);
+      echo "has the ordered author 'doc-$nid-author-$author7' as author and<br>";
+      ++$num_authors;
+    }
+    if (isset($author8)) {
+      $author8 = preg_replace($patterns, $replacements, $author8);
+      echo "has the ordered author 'doc-$nid-author-$author8' as author and<br>";
+      ++$num_authors;
+    }
+    if (isset($author9)) {
+      $author9 = preg_replace($patterns, $replacements, $author9);
+      echo "has the ordered author 'doc-$nid-author-$author9' as author and<br>";
+      ++$num_authors;
+    }
+    if (isset($author10)) {
+      $author10 = preg_replace($patterns, $replacements, $author10);
+      echo "has the ordered author 'doc-$nid-author-$author10' as author and<br>";
+      ++$num_authors;
+    }
+    if (isset($author11)) {
+      $author11 = preg_replace($patterns, $replacements, $author11);
+      echo "has the ordered author 'doc-$nid-author-$author11' as author and<br>";
+      ++$num_authors;
+    }
+    if (isset($author12)) {
+      $author12 = preg_replace($patterns, $replacements, $author12);
+      echo "has the ordered author 'doc-$nid-author-$author12' as author and<br>";
+      ++$num_authors;
+    }
+    if (isset($author13)) {
+      $author13 = preg_replace($patterns, $replacements, $author13);
+      echo "has the ordered author 'doc-$nid-author-$author13' as author and<br>";
+      ++$num_authors;
+    }
+    if (isset($author14)) {
+      $author14 = preg_replace($patterns, $replacements, $author14);
+      echo "has the ordered author 'doc-$nid-author-$author14' as author and<br>";
+      ++$num_authors;
+    }
+    if (isset($author15)) {
+      $author15 = preg_replace($patterns, $replacements, $author15);
+      echo "has the ordered author 'doc-$nid-author-$author15' as author and<br>";
+      ++$num_authors;
+    }
+    echo "has $num_authors as number of authors.<br>";
+
+    echo "<br>there is a ordered author named 'doc-$nid-author-$author1' that<br>";
+    echo "has the person '$author1' as author person and<br>";
+    echo "has '1' as author index.<br>";
+
+    if (isset($author2)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author2' that<br>";
+      echo "has the person '$author2' as author person and<br>";
+      echo "has '2' as author index.<br>";
+    }
+
+    if (isset($author3)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author3' that<br>";
+      echo "has the person '$author3' as author person and<br>";
+      echo "has '3' as author index.<br>";
+    }
+
+    if (isset($author4)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author4' that<br>";
+      echo "has the person '$author4' as author person and<br>";
+      echo "has '4' as author index.<br>";
+    }
+
+    if (isset($author5)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author5' that<br>";
+      echo "has the person '$author5' as author person and<br>";
+      echo "has '5' as author index.<br>";
+    }
+
+    if (isset($author6)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author6' that<br>";
+      echo "has the person '$author6' as author person and<br>";
+      echo "has '6' as author index.<br>";
+    }
+
+    if (isset($author7)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author7' that<br>";
+      echo "has the person '$author7' as author person and<br>";
+      echo "has '7' as author index.<br>";
+    }
+
+    if (isset($author8)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author8' that<br>";
+      echo "has the person '$author8' as author person and<br>";
+      echo "has '8' as author index.<br>";
+    }
+
+    if (isset($author9)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author9' that<br>";
+      echo "has the person '$author9' as author person and<br>";
+      echo "has '9' as author index.<br>";
+    }
+
+    if (isset($author10)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author10' that<br>";
+      echo "has the person '$author10' as author person and<br>";
+      echo "has '10' as author index.<br>";
+    }
+
+    if (isset($author11)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author11' that<br>";
+      echo "has the person '$author11' as author person and<br>";
+      echo "has '11' as author index.<br>";
+    }
+
+    if (isset($author12)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author12' that<br>";
+      echo "has the person '$author12' as author person and<br>";
+      echo "has '12' as author index.<br>";
+    }
+
+    if (isset($author13)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author13' that<br>";
+      echo "has the person '$author13' as author person and<br>";
+      echo "has '13' as author index.<br>";
+    }
+
+    if (isset($author14)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author14' that<br>";
+      echo "has the person '$author14' as author person and<br>";
+      echo "has '14' as author index.<br>";
+    }
+
+    if (isset($author15)) {
+      echo "<br>there is a ordered author named 'doc-$nid-author-$author15' that<br>";
+      echo "has the person '$author15' as author person and<br>";
+      echo "has '15' as author index.<br>";
+    }
+
+    $abstract = preg_replace($patterns, $replacements, $abstract);
+    echo "<br>the document 'doc-$nid' has '$abstract' as abstract.<br><br>";
+
+    if (isset($noteworthy)) {
+      $noteworthy = preg_replace($patterns, $replacements, $noteworthy);
+      echo "there is a noteworthy document named 'doc-$nid' that<br>";
+      echo "has '$noteworthy' as noteworthy reason.<br><br>";
+    }
+  }
+} else {
+  echo "-- No results";
+}
+
+?>
+</div>

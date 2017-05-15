@@ -1,0 +1,63 @@
+<div id="controlled-english-section">
+<?php
+
+$query = new EntityFieldQuery();
+
+$query->entityCondition('entity_type', 'node')
+      ->propertyCondition('type', 'SL_Citation_Paper');
+
+$result = $query->execute();
+
+function getValue($node, $field, $property) {
+  $items = field_get_items('node', $node, $field);
+  $render = field_view_value('node', $node, $field, $items[0]);
+  if (isset($render[$property]) && !empty($render[$property])) {
+    $result = $render[$property];
+    return $result;
+  } else {
+    return;
+  }
+}
+
+if (!empty($result['node'])) {
+  $nids = array_keys($result['node']);
+  $nodes = node_load_multiple($nids);
+
+  foreach ($nodes as $node) {
+    $nid = $node->nid;
+    $title = $node->title;
+
+    $url = getValue($node, 'field_gs_url', '#markup');
+    $citations = getValue($node, 'field_citation_details', '#markup');
+    $citations_arr = explode("\n", $citations);
+    $citations_arr = array_filter($citations_arr);
+
+    for ($i = 0; $i < count($citations_arr); $i++) {
+      echo "there is a paper citation count named '$title-$i' that<br>";
+      if ($url) {
+        echo "has '$url' as url and<br>";
+      }
+
+      $citation = $citations_arr[$i];
+      $facts_arr = explode("|", $citation);
+
+      if (count($facts_arr) === 2) {
+        $date = $facts_arr[0];
+        $count = trim($facts_arr[1]);
+
+        preg_match_all('/\w+-\d+/', $date, $matches);
+        $date = implode(' ', $matches[0]);
+
+        echo "has '$date' as date checked and<br>";
+        echo "has '$count' as citation count.<br><br>";
+      } else {
+        echo "-- ERROR in parsing citation '$citation'.<br><br>";
+      }
+    }
+  }
+} else {
+  echo "-- No results";
+}
+
+?>
+</div>
