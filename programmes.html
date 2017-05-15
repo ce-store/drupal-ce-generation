@@ -1,0 +1,45 @@
+<div id="controlled-english-section">
+<?php
+
+$query = new EntityFieldQuery();
+
+$query->entityCondition('entity_type', 'node')
+  ->propertyCondition('type', 'SL_Programme');
+
+$result = $query->execute();
+
+if (!empty($result['node'])) {
+  $nids = array_keys($result['node']);
+  $nodes = node_load_multiple($nids);
+
+  foreach ($nodes as $node) {
+    $full_name_items = field_get_items('node', $node, 'field_sl_fullname');
+    $full_name_render = field_view_value('node', $node, 'field_sl_fullname', $full_name_items[0]);
+    $full_name = $full_name_render["#markup"];
+
+    $is_default_items = field_get_items('node', $node, 'field_is_default');
+    $is_default_render = field_view_value('node', $node, 'field_is_default', $is_default_items[0]);
+    $is_default = $is_default_render["#markup"];
+
+    $start_date_items = field_get_items('node', $node, 'field_sl_startdate');
+    $start_date_render = field_view_value('node', $node, 'field_sl_startdate', $start_date_items[0]);
+    $start_date = $start_date_render["#markup"];
+
+    $end_date_items = field_get_items('node', $node, 'field_sl_enddate');
+    $end_date_render = field_view_value('node', $node, 'field_sl_enddate', $end_date_items[0]);
+    $end_date = $end_date_render["#markup"];
+
+    echo "there is a programme named '$node->title' that<br>";
+    if (strcmp($is_default, "Yes") === 0) {
+      echo "is a default programme and<br>";
+    }
+    echo "has '$full_name' as full name and<br>";
+    echo "has the date '$start_date' as start date and<br>";
+    echo "has the date '$end_date' as end date.<br>";
+  }
+} else {
+  echo "-- No results";
+}
+
+?>
+</div>

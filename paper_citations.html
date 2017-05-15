@@ -32,8 +32,15 @@ if (!empty($result['node'])) {
     $citations_arr = explode("\n", $citations);
     $citations_arr = array_filter($citations_arr);
 
-    for ($i = 0; $i < count($citations_arr); $i++) {
-      echo "there is a paper citation count named '$title-$i' that<br>";
+    $conName = "historical paper citation count";
+    $cCount = count($citations_arr);
+
+    for ($i = 0; $i < $cCount; $i++) {
+      if ($i == ($cCount -1)) {
+        $conName = "latest paper citation count";
+      }
+
+      echo "there is a $conName named '$title-$i' that<br>";
       if ($url) {
         echo "has '$url' as url and<br>";
       }

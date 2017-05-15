@@ -40,6 +40,7 @@ if (!empty($result['node'])) {
 
     if ($citation_obj) {
       $citation = $citation_obj->title;
+      $citation = str_replace("'", "\'", $citation);
 
       $citations = getValue($citation_obj, 'field_citation_details', '#markup');
       $citations_arr = explode("\n", $citations);

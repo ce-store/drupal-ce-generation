@@ -4,7 +4,7 @@
 $query = new EntityFieldQuery();
 
 $query->entityCondition('entity_type', 'node')
-      ->propertyCondition('type', 'SL_Project');
+      ->propertyCondition('type', 'SL_Date');
 
 $result = $query->execute();
 
@@ -27,20 +27,16 @@ if (!empty($result['node'])) {
     $nid = $node->nid;
     $title = $node->title;
 
-    $code_name = getValue($node, 'field_code_name', '#markup');
-    $name = getValue($node, 'field_sl_fullname', '#markup');
+    // echo "<pre>";
+    // print_r($node);
+    // echo "</pre>";
 
-    $area_options = getValue($node, 'field_technical_area', '#options');
-    $plan_options = getValue($node, 'field_project_plan', '#options');
+    $month = getValue($node, 'field_sl_month', '#markup');
+    $year = getValue($node, 'field_sl_year', '#markup');
 
-    $area = $area_options['entity']->title;
-    $plan = $plan_options['entity']->title;
-
-    echo "there is a project named '$title' that<br>";
-    echo "has '$code_name' as code name and<br>";
-    echo "has '$name' as name and<br>";
-    echo "has the project plan '$plan' as project plan and<br>";
-    echo "has the technical area '$area' as technical area.<br><br>";
+    echo "there is a date named '$title' that<br>";
+    echo "has '$month' as month and<br>";
+    echo "has '$year' as year.<br><br>";
   }
 } else {
   echo "-- No results";

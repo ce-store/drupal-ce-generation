@@ -29,10 +29,9 @@ if (!empty($result['node'])) {
     $abstract = getValue($node, 'field_abstract', '#markup');
     $published_type = getValue($node, 'field_published_type', '#markup');
     $publish_date = getValue($node, 'field_publish_date', '#markup');
-    $event = getValue($node, 'field_sl_event', '#markup');
     $venue_details = getValue($node, 'field_venue_details', '#markup');
     $noteworthy = getValue($node, 'field_noteworthy', '#markup');
-
+    $event = getValue($node, 'field_sl_event', '#title');
     $programme = getValue($node, 'field_programme', '#title');
     $project = getValue($node, 'field_project', '#title');
 

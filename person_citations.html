@@ -27,13 +27,20 @@ if (!empty($result['node'])) {
     $nid = $node->nid;
     $title = $node->title;
 
+    $title = str_replace("'", "\'", $title);
+
     $url = getValue($node, 'field_gs_url', '#markup');
     $citations = getValue($node, 'field_citation_details', '#markup');
     $citations_arr = explode("\n", $citations);
     $citations_arr = array_filter($citations_arr);
 
-    for ($i = 0; $i < count($citations_arr); $i++) {
-      echo "there is a person citation count named '$title-$i' that<br>";
+    $conName = "historical person citation count";
+    $cCount = count($citations_arr);
+    for ($i = 0; $i < $cCount; $i++) {
+      if ($i == ($cCount -1)) {
+        $conName = "latest person citation count";
+      }
+      echo "there is a $conName named '$title-$i' that<br>";
       if ($url) {
         echo "has '$url' as url and<br>";
       }

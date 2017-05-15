@@ -27,6 +27,10 @@ if (!empty($result['node'])) {
     $nid = $node->nid;
     $title = $node->title;
 
+    // echo "<pre>";
+    // print_r($node);
+    // echo "</pre>";
+
     $fullname = getValue($node, 'field_sl_fullname', '#markup');
     $date = getValue($node, 'field_sl_date', '#markup');
     $start_date = getValue($node, 'field_sl_startdate', '#markup');
@@ -59,7 +63,7 @@ if (!empty($result['node'])) {
 
   }
 } else {
-  echo "No results";
+  echo "-- No results";
 }
 
 ?>
