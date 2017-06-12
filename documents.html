@@ -33,7 +33,7 @@ if (!empty($result['node'])) {
     $noteworthy = getValue($node, 'field_noteworthy', '#markup');
     $event = getValue($node, 'field_sl_event', '#title');
     $programme = getValue($node, 'field_programme', '#title');
-    $project = getValue($node, 'field_project', '#title');
+    $project_items = field_get_items('node', $node, 'field_project');
 
     $citation_options = getValue($node, 'field_citation', '#options');
     $publication = getValue($node, 'field_publication', '#options');
@@ -112,10 +112,14 @@ if (!empty($result['node'])) {
 
     $patterns = array();
     $patterns[0] = "/'/";
-    $patterns[1] = "/’/";
+    $patterns[1] = "/'/";
+    $patterns[2] = "/’/";
+    $patterns[3] = "/‘/";
     $replacements = array();
     $replacements[0] = "\'";
     $replacements[1] = "\'";
+    $replacements[2] = "\'";
+    $replacements[3] = "\'";
 
     $title = preg_replace($patterns, $replacements, $title);
 
@@ -140,9 +144,21 @@ if (!empty($result['node'])) {
       $venue_details = preg_replace($patterns, $replacements, $venue_details);
       echo "has '$venue_details' as venue details and<br>";
     }
-    if (isset($project)) {
-      $project = preg_replace($patterns, $replacements, $project);
-      echo "has the project '$project' as project and<br>";
+    if (is_array($project_items)) {
+      $project_arr = [];
+      foreach ($project_items as $project_item) {
+        $project_render = field_view_value('node', $node, 'field_project', $project_item);
+        $project_options = $project_render['#options'];
+        $project_entity = $project_options['entity'];
+        $project_id = $project_entity->title;
+        $project_arr[] = $project_id;
+      }
+    }
+    if (isset($project_arr)) {
+      foreach ($project_arr as $project) {
+        $project = preg_replace($patterns, $replacements, $project);
+        echo "has the project '$project' as project and<br>";
+      }
     }
     if (isset($variant)) {
       $variant = preg_replace($patterns, $replacements, $variant);
