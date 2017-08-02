@@ -66,6 +66,9 @@ if (!empty($result['node'])) {
     if (isset($variant_options)) {
       $variant_entity = $variant_options['entity'];
       $variant = $variant_entity->nid;
+    } else {
+      unset($variant_entity);
+      unset($variant);
     }
 
     $file_items = field_get_items('node', $node, 'field_publicfile');
