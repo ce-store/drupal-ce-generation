@@ -62,13 +62,16 @@ if (!empty($result['node'])) {
       }
     }
 
-    $variant_options = getValue($node, 'field_paper_variant', '#options');
-    if (isset($variant_options)) {
-      $variant_entity = $variant_options['entity'];
-      $variant = $variant_entity->nid;
-    } else {
-      unset($variant_entity);
-      unset($variant);
+    $variants = array();
+    $variant_items = field_get_items('node', $node, 'field_paper_variant');
+    if (is_array($variant_items)) {
+      foreach ($variant_items as $variant_item) {
+        $variant_render = field_view_value('node', $node, 'field_paper_variant', $variant_item);
+        $variant_options = $variant_render['#options'];
+        $variant_entity = $variant_options['entity'];
+        $variant = $variant_entity->nid;
+        $variants[] = $variant;
+      }
     }
 
     $file_items = field_get_items('node', $node, 'field_publicfile');
@@ -76,7 +79,8 @@ if (!empty($result['node'])) {
       foreach ($file_items as $file_item) {
         $file_render = field_view_value('node', $node, 'field_publicfile', $file_item);
         $file = $file_render['#file'];
-        $filename = $file->filename;
+        $filename = $file->uri;
+        $filename = str_replace("public://","", $filename);
         $description = $file->description;
 
         if (strcmp($description, 'Paper file') == 0) {
@@ -163,9 +167,11 @@ if (!empty($result['node'])) {
         echo "has the project '$project' as project and<br>";
       }
     }
-    if (isset($variant)) {
-      $variant = preg_replace($patterns, $replacements, $variant);
-      echo "has the document 'doc-$variant' as variant and<br>";
+    if (isset($variants)) {
+      foreach ($variants as $variant) {
+        $variant = preg_replace($patterns, $replacements, $variant);
+        echo "has the document 'doc-$variant' as variant and<br>";
+      }
     }
     if (isset($paper_file)) {
       echo "has 'https://dais-ita.org/sites/default/files/$paper_file' as paper file and<br>";
