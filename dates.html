@@ -1,6 +1,6 @@
 <div id="controlled-english-section">
 <?php
-
+$years = array();
 $query = new EntityFieldQuery();
 
 $query->entityCondition('entity_type', 'node')
@@ -37,6 +37,15 @@ if (!empty($result['node'])) {
     echo "there is a date named '$title' that<br>";
     echo "has '$month' as month and<br>";
     echo "has '$year' as year.<br><br>";
+
+    if(!in_array($year, $years)){
+      $years[] = $year;
+    }
+  }
+
+  echo "<br>";
+  foreach ($years as $year) {
+    echo "there is a year named '$year'.<br>";
   }
 } else {
   echo "-- No results";
