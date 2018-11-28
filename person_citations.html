@@ -1,6 +1,5 @@
 <div id="controlled-english-section">
 <?php
-
 $query = new EntityFieldQuery();
 
 $query->entityCondition('entity_type', 'node')
@@ -34,13 +33,11 @@ if (!empty($result['node'])) {
     $citations_arr = explode("\n", $citations);
     $citations_arr = array_filter($citations_arr);
 
-    $conName = "historical person citation count";
+    $conName = "latest person citation count";
     $cCount = count($citations_arr);
     for ($i = 0; $i < $cCount; $i++) {
-      if ($i == ($cCount -1)) {
-        $conName = "latest person citation count";
-      }
       echo "there is a $conName named '$title-$i' that<br>";
+      $conName = "historical person citation count";
       if ($url) {
         echo "has '$url' as url and<br>";
       }
@@ -53,8 +50,10 @@ if (!empty($result['node'])) {
         $count = $facts_arr[1];
         $h_index = $facts_arr[2];
 
-        preg_match_all('/\w+-\d+/', $date, $matches);
-        $date = implode(' ', $matches[0]);
+        if ($date !== 'CURRENT') {
+            preg_match_all('/\w+-\d+/', $date, $matches);
+            $date = implode(' ', $matches[0]);
+        }
 
         preg_match_all('/\d+/', $h_index, $matches);
         $h_index = implode(' ', $matches[0]);
