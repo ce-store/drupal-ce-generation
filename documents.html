@@ -34,6 +34,7 @@ if (!empty($result['node'])) {
     $event = getValue($node, 'field_sl_event', '#title');
     $programme = getValue($node, 'field_programme', '#title');
     $project_items = field_get_items('node', $node, 'field_project');
+    $external_url = getValue($node, 'field_sl_url', '#markup');
 
     $citation_options = getValue($node, 'field_citation', '#options');
     $publication = getValue($node, 'field_publication', '#options');
@@ -140,6 +141,9 @@ if (!empty($result['node'])) {
 
     echo "applies to the programme '$programme' and<br>";
 
+    if (isset($external_url)) {
+      echo "has  '$external_url' as external url and<br>";
+    }
     if (isset($publish_date)) {
       echo "has the date '$publish_date' as publish date and<br>";
     }
@@ -151,8 +155,9 @@ if (!empty($result['node'])) {
       $venue_details = preg_replace($patterns, $replacements, $venue_details);
       echo "has '$venue_details' as venue details and<br>";
     }
+
+    $project_arr = [];
     if (is_array($project_items)) {
-      $project_arr = [];
       foreach ($project_items as $project_item) {
         $project_render = field_view_value('node', $node, 'field_project', $project_item);
         $project_options = $project_render['#options'];
